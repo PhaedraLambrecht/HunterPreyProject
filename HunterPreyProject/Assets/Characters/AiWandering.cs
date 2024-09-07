@@ -39,16 +39,14 @@ public class AiWandering : MonoBehaviour
 
         for (int i = 0; i < numSteps; i++)
         {
-            float randAngle = Random.Range(0, (2 * Mathf.PI)); // Get a random angle between 0 & 2?
+            float randAngle = Random.Range(0, (2 * Mathf.PI)); // Get a random angle between 0 & 2pi
 
-            // ??(????) ? 1 / (????1 + ??)
+
             float stepLength = Mathf.Pow(Random.value, -1f / stepLengthExponent);// Calculate step length.
-            stepLength = Mathf.Min(stepLength, dist); // Ensure the step doesn't exceed the wander radius
+            stepLength = Mathf.Min(stepLength, dist);
 
-         
             Vector3 direction = new Vector3(Mathf.Cos(randAngle), 0, Mathf.Sin(randAngle)); // Calculate the direction vector
             Vector3 randomStep = direction * stepLength; // Calculate the random step
-
 
             accumulatedDisplacement += randomStep; // Accumulate the displacement
         }
@@ -59,7 +57,6 @@ public class AiWandering : MonoBehaviour
         accumulatedDisplacement /= scaleFactor;
 
 
-        // Determine the new position
         Vector3 newPos = origin + accumulatedDisplacement;
 
         // Ensure the new position is within the NavMesh
