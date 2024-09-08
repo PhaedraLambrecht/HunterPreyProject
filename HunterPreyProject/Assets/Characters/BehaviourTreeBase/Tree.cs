@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-namespace BehaviuorTree
+namespace BehaviourTree
 {
     public abstract class Tree : MonoBehaviour
     {

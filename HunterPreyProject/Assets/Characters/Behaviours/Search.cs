@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace BehaviuorTree
+namespace BehaviourTree
 {
     public class Search : Node
     {

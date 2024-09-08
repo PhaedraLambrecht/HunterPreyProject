@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 
-namespace BehaviuorTree
+namespace BehaviourTree
 {
     public class Sequance : Node
     {

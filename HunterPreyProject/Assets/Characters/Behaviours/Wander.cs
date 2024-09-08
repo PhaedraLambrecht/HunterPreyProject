@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace BehaviuorTree
+namespace BehaviourTree
 {
     public class Wander : Node
     {
