@@ -105,7 +105,7 @@ namespace BehaviourTree
 
             while (rotationElapsedTime < rotationDuration)
             {
-                Debug.Log("Rotation search happening.");
+       //         Debug.Log("Rotation search happening.");
                 float rotationAmount = rotationSpeed * Time.deltaTime;
 
                 // Rotate in the chosen direction
@@ -133,7 +133,7 @@ namespace BehaviourTree
 
             while (elapsedTime < searchTime)
             {
-                Debug.Log("Walking search happening.");
+      //          Debug.Log("Walking search happening.");
                 Vector3 randomDirection = Random.insideUnitSphere * _searchRadius;
                 randomDirection += lastKnownPosition;
 

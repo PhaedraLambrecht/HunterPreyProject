@@ -40,8 +40,6 @@ namespace BehaviourTree
         // Lévy Flight implementation
         private Vector3 LevyFlight(Vector3 origin, float dist, float stepLengthExponent)
         {
-            Debug.Log("Wandering - don't mind me =).");
-
             Vector3 accumulatedDisplacement = Vector3.zero;
 
             for (int i = 0; i < _numSteps; i++)

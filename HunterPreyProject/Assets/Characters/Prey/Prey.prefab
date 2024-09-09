@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3960889801664532460}
   - component: {fileID: 1450187859117149248}
   - component: {fileID: 2449690608540591773}
-  - component: {fileID: 4019930776037003787}
+  - component: {fileID: 5760532077978536632}
   m_Layer: 0
   m_Name: Prey
   m_TagString: Untagged
@@ -157,7 +157,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &4019930776037003787
+--- !u!114 &5760532077978536632
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -166,9 +166,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 749692913178794927}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bf042ebff3f3129459a891e93d3ee123, type: 3}
+  m_Script: {fileID: 11500000, guid: 87346c232f60de8468ed09feb3e4241b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _wanderRadius: 20
-  _maxWanderTime: 2
-  _stepLengthExponent: 2
+  agent: {fileID: 1450187859117149248}
+  wanderRadius: 20
+  maxWanderTime: 2
+  stepLengthExponent: 2
+  fovRange: 5
+  predictiontime: 0
