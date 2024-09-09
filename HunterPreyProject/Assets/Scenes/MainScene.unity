@@ -143,6 +143,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1450187859117149248, guid: e8adfa402c922d349815d08da0b5bca4, type: 3}
+      propertyPath: m_Speed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3516266878291934630, guid: e8adfa402c922d349815d08da0b5bca4, type: 3}
       propertyPath: m_LocalPosition.x
       value: -20.75
@@ -582,32 +586,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1616962550}
     - target: {fileID: -4861647985201306865, guid: 8d98b744799a65747b8e381083868787, type: 3}
-      propertyPath: searchTime
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: -4861647985201306865, guid: 8d98b744799a65747b8e381083868787, type: 3}
-      propertyPath: maxWanderTime
-      value: 2
+      propertyPath: searchRadius
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -4861647985201306865, guid: 8d98b744799a65747b8e381083868787, type: 3}
       propertyPath: coroutineManager
       value: 
       objectReference: {fileID: 1632878679}
-    - target: {fileID: -4861647985201306865, guid: 8d98b744799a65747b8e381083868787, type: 3}
-      propertyPath: stepLengthExponent
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: -4861647985201306865, guid: 8d98b744799a65747b8e381083868787, type: 3}
-      propertyPath: fieldOfViewDistance
-      value: 15
-      objectReference: {fileID: 0}
     - target: {fileID: 2769638783457438051, guid: 8d98b744799a65747b8e381083868787, type: 3}
       propertyPath: m_Name
       value: Predator
-      objectReference: {fileID: 0}
-    - target: {fileID: 2769638783457438051, guid: 8d98b744799a65747b8e381083868787, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3283469020849515260, guid: 8d98b744799a65747b8e381083868787, type: 3}
       propertyPath: m_LocalPosition.x

@@ -5,50 +5,59 @@ namespace BehaviourTree
 {
     public class PreyInFOV : Node
     {
-        private Transform _predator;
-        private Transform _prey;
-        private float _fieldOfViewAngle;
-        private float _fieldOfViewDistance;
-   
+        private static int _preyLayer = 1 << 6;
+        private Transform _agentTransform;
+        private float _fovAngle;
+
         public bool IsSuccess => state == NodeState.Succes;
 
 
-        public PreyInFOV(Transform predator, Transform prey, float fieldOfViewAngle, float fieldOfViewDistance)
+        public PreyInFOV(Transform agentTransform, float fovAngle)
         {
-            _predator = predator;
-            _prey = prey;
-            _fieldOfViewAngle = fieldOfViewAngle;
-            _fieldOfViewDistance = fieldOfViewDistance;
+            _agentTransform = agentTransform;
+            _fovAngle = fovAngle;
         }
 
         public override NodeState Evaluate()
         {
-            if (IsPreyInFieldOfView(_predator, _prey, _fieldOfViewAngle, _fieldOfViewDistance))
+            object j = GetData("Prey");
+            if (j == null)
             {
-                state = NodeState.Succes;
-            }
-            else
-            {
+                Collider[] colliders = Physics.OverlapSphere(_agentTransform.position, _fovAngle, _preyLayer);
+
+                foreach (Collider collider in colliders)
+                {
+                    Transform preyTransform = collider.transform;
+                    if (IsPreyInFOV(_agentTransform, preyTransform, _fovAngle))
+                    {
+                        parent.parent.SetData("Prey", preyTransform);
+                        state = NodeState.Succes;
+                        return state;
+                    }
+                }
+
                 state = NodeState.Failure;
+                return state;
             }
 
+            state = NodeState.Succes;
             return state;
         }
 
-        public static bool IsPreyInFieldOfView(Transform predator, Transform prey, float fieldOfViewAngle, float fieldOfViewDistance)
+        private bool IsPreyInFOV(Transform agent, Transform prey, float fovAngle)
         {
-            Vector3 directionToPrey = prey.position - predator.position;
+            Vector3 directionToPrey = prey.position - agent.position;
             float distanceToPreySqr = directionToPrey.sqrMagnitude;
 
-            if (distanceToPreySqr > fieldOfViewDistance * fieldOfViewDistance)
+            if (distanceToPreySqr > _fovAngle * _fovAngle) // use a range check to optimize
             {
                 return false;
             }
 
             directionToPrey.Normalize();
-            float angle = Vector3.Angle(predator.forward, directionToPrey);
+            float angle = Vector3.Angle(agent.forward, directionToPrey);
 
-            return angle < fieldOfViewAngle / 2f;
+            return angle < fovAngle / 2f;
         }
 
     }

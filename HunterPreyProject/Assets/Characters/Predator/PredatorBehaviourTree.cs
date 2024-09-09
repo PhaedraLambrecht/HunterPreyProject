@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,8 +9,6 @@ namespace BehaviourTree
     public class PredatorBehaviourTree : Tree
     {
         public NavMeshAgent agent;
-        public CoroutineManager coroutineManager;
-
         public Transform _prey;
 
         // Wandering
@@ -17,35 +17,43 @@ namespace BehaviourTree
         public float stepLengthExponent = 2.0f;
 
         // Searching
-        public float searchRadius = 10f;
-        public float searchTime = 5f; // Duration for search
+        public float fovRange = 5.0f;
 
-        // Pursuit
+
+        //// Pursuit
         public float stopRadius = 5.0f;
-        public float fieldOfViewAngle = 45f;
-        public float fieldOfViewDistance = 20f;
+        public float predictiontime = 0;
 
+        // Search
+        public CoroutineManager coroutineManager;
+        public float searchTime = 0;
+        public float searchRadius = 10.0f;
+
+        private Search _search;
+        private Pursuit _pursuit;
+        private Wander _wander;
 
 
         protected override Node SetUpTree()
         {
             // Behaviours
-            Node wander = new Wander(agent, wanderRadius, maxWanderTime, stepLengthExponent);
-            Node search = new Search(agent, coroutineManager, searchRadius, searchTime, _prey.position);
+            _search = new Search(agent, coroutineManager, searchRadius, searchTime, _prey.position);
+            _pursuit = new Pursuit(agent, stopRadius, predictiontime);
+            _wander = new Wander(agent, wanderRadius, maxWanderTime, stepLengthExponent);
 
-            Node pursuit = new Pursuit(agent, _prey, stopRadius, fieldOfViewAngle, fieldOfViewDistance, searchRadius);
 
-            Node checkPreyDetected = new SmellingRangeCheck(agent.transform, _prey, searchRadius);
-            Node checkPreyInView = new PreyInFOV(agent.transform, _prey, fieldOfViewAngle, fieldOfViewDistance);
+            // Sequances
+            Sequance pursuitSequence = new Sequance(new List<Node> { new PreyInFOV(agent.transform, fovRange), _pursuit });
+            Sequance searchSequance = new Sequance(new List<Node> { new CheckPreyInSmellRange(agent.transform, searchRadius), _search });
 
-            // Define sequences
-            Sequance pursuitSequence = new Sequance(new List<Node> { checkPreyInView, pursuit });
-            Sequance searchSequence = new Sequance(new List<Node> { checkPreyDetected, search });
+            Sequance searchPursuitSequence = new Sequance(new List<Node> { searchSequance, pursuitSequence });
 
-            // Define selectors
-            Selector searchOrWander = new Selector(new List<Node> { searchSequence, wander });
-            Selector root = new Selector(new List<Node> { pursuitSequence, searchOrWander });
-
+            // Root
+            Node root = new Selector(new List<Node>
+            {
+               searchPursuitSequence,
+               _wander
+            }) ;
 
             return root;
         }

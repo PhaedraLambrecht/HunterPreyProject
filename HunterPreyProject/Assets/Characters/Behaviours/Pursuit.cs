@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,88 +7,65 @@ namespace BehaviourTree
     public class Pursuit : Node
     {
         private NavMeshAgent _agent;
-        private Transform _prey;
 
         private float _stopRadius;
-        private float _fieldOfViewAngle;
-        private float _fieldOfViewDistance;
-        private float _searchRadius;
+        private float _predictionTime;
+   
 
-        private Vector3 _lastKnownPosition;
-        private bool _isPursuing = false;
-
-
-
-        public Pursuit(NavMeshAgent agent, Transform prey, float stopRadius, float fieldOfViewAngle, float fieldOfViewDistance, float searchRadius)
+        public Pursuit(NavMeshAgent agent, float stopRadius, float predictiontime)
         {
             _agent = agent;
-            _prey = prey;
             _stopRadius = stopRadius;
-            _fieldOfViewAngle = fieldOfViewAngle;
-            _fieldOfViewDistance = fieldOfViewDistance;
-            _searchRadius = searchRadius;
+            _predictionTime = predictiontime;
         }
+
 
         public override NodeState Evaluate()
         {
-            if (IsPreyInFieldOfView(_prey))
+            Debug.Log("pursuit - Who is she?");
+
+            Transform target = (Transform)GetData("Prey");
+
+            Vector3 predictedPosition = PredictTargetPosition(target);
+            float distanceToPredicted = Vector3.Distance(_agent.transform.position, predictedPosition); // calculate distance to predicted position
+
+
+            // if close enough, stop pursuing
+            if (distanceToPredicted <= _stopRadius)
             {
-                _lastKnownPosition = _prey.position;
-                _isPursuing = true;
-                PursuitPrey();
-                state = NodeState.Running;
-            }
-            else if (_isPursuing && Vector3.Distance(_agent.transform.position, _prey.position) <= _searchRadius)
-            {
-                // Continue pursuing if the prey was recently visible and is still within the search radius
-                PursuitPrey();
-                state = NodeState.Running;
-            }
-            else
-            {
-                // Stop pursuing and transition to search if the prey is out of view and beyond the search radius
-                _agent.ResetPath();
-                _isPursuing = false;
-                state = NodeState.Failure;
+                state = NodeState.Succes;
+                return state;
             }
 
+
+            _agent.transform.position = Vector3.MoveTowards(_agent.transform.position, predictedPosition, 5.0f * Time.deltaTime);
+          
+            Vector3 lookAtDirection = CalculateLookAtDirection(_agent.transform.position, predictedPosition);
+
+            _agent.transform.LookAt(predictedPosition, lookAtDirection);
+
+
+            state = NodeState.Running;
             return state;
         }
 
 
-        private bool IsPreyInFieldOfView(Transform preyTransform)
+        private Vector3 CalculateLookAtDirection(Vector3 from, Vector3 to)
         {
-            Vector3 directionToPrey = preyTransform.position - _agent.transform.position;
-            float distanceToPreySqr = directionToPrey.sqrMagnitude;
+            Vector3 direction = (to - from).normalized;
+            float yaw = Mathf.Atan2(direction.z, direction.x);
 
-            if (distanceToPreySqr > _fieldOfViewDistance * _fieldOfViewDistance)
-            {
-                return false;
-            }
+            // Create a new direction vector with the y component fixed at 0.5
+            Vector3 lookAtDirection = new Vector3(Mathf.Cos(yaw), 1.0f, Mathf.Sin(yaw));
 
-            directionToPrey.Normalize();
-            float angle = Vector3.Angle(_agent.transform.forward, directionToPrey);
-
-            return angle < _fieldOfViewAngle / 2f;
+            return lookAtDirection.normalized;
         }
 
-        private void PursuitPrey()
+
+        private Vector3 PredictTargetPosition(Transform target)
         {
-            float distanceFromPrey = Vector3.Distance(_agent.transform.position, _prey.position);
-
-            if (distanceFromPrey > _stopRadius)
-            {
-                Vector3 directionAwayFromPrey = (_agent.transform.position - _prey.position).normalized;
-                Vector3 destination = _prey.position + (directionAwayFromPrey * _stopRadius);
-
-                // Set the agent's destination
-                _agent.SetDestination(destination);
-            }
-            else
-            {
-                _agent.ResetPath();
-            }
+            Vector3 targetVelocity = target.GetComponent<Rigidbody>().velocity; // assume prey has a Rigidbody
+            return target.position + targetVelocity * _predictionTime; // predict prey's future position
         }
     }
 }
-
