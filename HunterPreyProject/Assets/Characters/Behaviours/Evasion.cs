@@ -22,9 +22,6 @@ namespace BehaviourTree
 
         public override NodeState Evaluate()
         {
-            Debug.Log("Evasion - Never heard of her.");
-
-
             Transform target = (Transform)GetData("Predator");
             Vector3 predictedPosition = PredictTargetPosition(target);
 

@@ -27,18 +27,27 @@ namespace BehaviourTree
             _coroutineManager = coroutineManager;
             _searchRadius = searchRadius;
             _searchTime = searchTime;
-            _lastKnownPosition = lastKnownPosition;
+       //     _lastKnownPosition = lastKnownPosition;
         }
 
 
         public override NodeState Evaluate()
         {
+            object j = GetData("PreySmell");
+            if(j != null)
+            {
+                Transform preyTransform = j as Transform; // Cast j to a Transform
+                _lastKnownPosition = preyTransform.position;
+            }
+
+
             if (_isSearching)
             {
                 // Check if the coroutine is still running
                 if (_searchCoroutine == null)
                 {
                     _isSearching = false;
+                    parent.parent.ClearData("PreySmell");
                     state = NodeState.Succes; // Search completed successfully
                 }
                 else
@@ -49,10 +58,7 @@ namespace BehaviourTree
                         _isSearching = false;
                         state = NodeState.Failure; // Search timed out
                     }
-                    else
-                    {
-                        state = NodeState.Running; // Continue running
-                    }
+      
                 }
 
                 return state;
@@ -61,7 +67,9 @@ namespace BehaviourTree
             _isSearching = true;
             _startTime = Time.time; // Start the timer
             _searchCoroutine = _coroutineManager.StartManagedCoroutine(SearchForPrey(_lastKnownPosition));
-            return NodeState.Running;
+            state = NodeState.Running; // Continue running
+            
+            return state;
         }
 
         private IEnumerator SearchForPrey(Vector3 lastKnownPosition)
@@ -105,7 +113,6 @@ namespace BehaviourTree
 
             while (rotationElapsedTime < rotationDuration)
             {
-       //         Debug.Log("Rotation search happening.");
                 float rotationAmount = rotationSpeed * Time.deltaTime;
 
                 // Rotate in the chosen direction
@@ -133,7 +140,6 @@ namespace BehaviourTree
 
             while (elapsedTime < searchTime)
             {
-      //          Debug.Log("Walking search happening.");
                 Vector3 randomDirection = Random.insideUnitSphere * _searchRadius;
                 randomDirection += lastKnownPosition;
 

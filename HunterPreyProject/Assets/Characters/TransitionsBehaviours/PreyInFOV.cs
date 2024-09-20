@@ -20,8 +20,8 @@ namespace BehaviourTree
 
         public override NodeState Evaluate()
         {
-            object j = GetData("Prey");
-            if (j == null)
+            object j = GetData("PreySmell");
+            if (j != null)
             {
                 Collider[] colliders = Physics.OverlapSphere(_agentTransform.position, _fovAngle, _preyLayer);
 
@@ -32,6 +32,7 @@ namespace BehaviourTree
                     {
                         parent.parent.SetData("Prey", preyTransform);
                         state = NodeState.Succes;
+                        parent.parent.ClearData("PreySmell");
                         return state;
                     }
                 }
@@ -40,7 +41,7 @@ namespace BehaviourTree
                 return state;
             }
 
-            state = NodeState.Succes;
+            state = NodeState.Running;
             return state;
         }
 
@@ -57,7 +58,7 @@ namespace BehaviourTree
             directionToPrey.Normalize();
             float angle = Vector3.Angle(agent.forward, directionToPrey);
 
-            return angle < fovAngle / 2f;
+            return angle < fovAngle;
         }
 
     }

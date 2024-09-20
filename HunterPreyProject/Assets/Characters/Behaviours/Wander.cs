@@ -23,17 +23,30 @@ namespace BehaviourTree
 
         public override NodeState Evaluate()
         {
-            _timer += Time.deltaTime;
-
-            if (_timer >= _maxWanderTime)
+            object j = parent.GetData("PreySmell");
+            if (j == null)
             {
-                Vector3 newPos = LevyFlight(_agent.transform.position, _wanderRadius, _stepLengthExponent);
-                _agent.SetDestination(newPos);
-                _timer = 0;
+                _timer += Time.deltaTime;
+
+                if (_timer >= _maxWanderTime)
+                {
+                    Vector3 newPos = LevyFlight(_agent.transform.position, _wanderRadius, _stepLengthExponent);
+                    _agent.SetDestination(newPos);
+                    _timer = 0;
+                }
+
+                // If the agent is still moving, return Running
+                if (_agent.pathPending || _agent.remainingDistance > _agent.stoppingDistance)
+                {
+                    state = NodeState.Running;
+                }
+                else
+                {
+                    state = NodeState.Succes; // Wander has finished
+                }
+
             }
 
-            // Return Running while the agent is moving
-            state = NodeState.Running;
             return state;
         }
 

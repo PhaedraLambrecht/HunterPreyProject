@@ -18,23 +18,29 @@ namespace BehaviourTree
 
         public override NodeState Evaluate()
         {
-            object j = GetData("Prey");
+            object j = GetData("PreySmell");
             if (j == null)
             {
-                Collider[] collider = Physics.OverlapSphere(_agentTransform.position, _fovRange, _preyLayer);
-
-                if (collider.Length > 0)
+                object preyJ = GetData("Prey");
+                if(preyJ == null)
                 {
-                    parent.parent.SetData("Prey", collider[0].transform);
-                    state = NodeState.Succes;
-                    return state;
+                    Collider[] collider = Physics.OverlapSphere(_agentTransform.position, _fovRange, _preyLayer);
+
+                    if (collider.Length > 0)
+                    {
+                        parent.parent.SetData("PreySmell", collider[0].transform);
+                        state = NodeState.Succes;
+                        return state;
+                    }
+
                 }
+
 
                 state = NodeState.Failure;
                 return state;
             }
 
-            state = NodeState.Succes;
+            state = NodeState.Running;
             return state;
         }
     }

@@ -12,11 +12,10 @@ namespace BehaviourTree
         private float _predictionTime;
    
 
-        public Pursuit(NavMeshAgent agent, float stopRadius, float predictiontime)
+        public Pursuit(NavMeshAgent agent, float stopRadius)
         {
             _agent = agent;
             _stopRadius = stopRadius;
-            _predictionTime = predictiontime;
         }
 
 
@@ -24,27 +23,35 @@ namespace BehaviourTree
         {
             Transform target = (Transform)GetData("Prey");
 
-            Vector3 predictedPosition = PredictTargetPosition(target);
-            float distanceToPredicted = Vector3.Distance(_agent.transform.position, predictedPosition); // calculate distance to predicted position
-
-
-            // if close enough, stop pursuing
-            if (distanceToPredicted <= _stopRadius)
+            if (target != null)
             {
-                state = NodeState.Succes;
+                Vector3 predictedPosition = PredictTargetPosition(target);
+                float distanceToPredicted = Vector3.Distance(_agent.transform.position, predictedPosition); // calculate distance to predicted position
+
+
+                // if close enough, stop pursuing
+                if (distanceToPredicted <= _stopRadius)
+                {
+                    parent.parent.ClearData("Prey");
+                    state = NodeState.Succes;
+                    return state;
+                }
+
+                _agent.transform.position = Vector3.MoveTowards(_agent.transform.position, predictedPosition, 5.0f * Time.deltaTime);
+
+                Vector3 lookAtDirection = CalculateLookAtDirection(_agent.transform.position, predictedPosition);
+
+                _agent.transform.LookAt(predictedPosition, lookAtDirection);
+
+
+                state = NodeState.Running;
                 return state;
             }
-
-
-            _agent.transform.position = Vector3.MoveTowards(_agent.transform.position, predictedPosition, 5.0f * Time.deltaTime);
-          
-            Vector3 lookAtDirection = CalculateLookAtDirection(_agent.transform.position, predictedPosition);
-
-            _agent.transform.LookAt(predictedPosition, lookAtDirection);
-
-
-            state = NodeState.Running;
-            return state;
+           else
+            {
+                state = NodeState.Failure;
+                return state;
+            }
         }
 
 
@@ -63,7 +70,7 @@ namespace BehaviourTree
         private Vector3 PredictTargetPosition(Transform target)
         {
             Vector3 targetVelocity = target.GetComponent<Rigidbody>().velocity; // assume prey has a Rigidbody
-            return target.position + targetVelocity * _predictionTime; // predict prey's future position
+            return target.position; // predict prey's future position
         }
     }
 }

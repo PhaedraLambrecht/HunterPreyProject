@@ -20,7 +20,6 @@ namespace BehaviourTree
 
         //// Pursuit
         public float stopRadius = 5.0f;
-        public float predictiontime = 0;
 
         // Search
         public CoroutineManager coroutineManager;
@@ -36,7 +35,7 @@ namespace BehaviourTree
         {
             // Behaviours
             _search = new Search(agent, coroutineManager, searchRadius, searchTime, _prey.position);
-            _pursuit = new Pursuit(agent, stopRadius, predictiontime);
+            _pursuit = new Pursuit(agent, stopRadius);
             _wander = new Wander(agent, wanderRadius, maxWanderTime, stepLengthExponent);
 
 
@@ -44,14 +43,14 @@ namespace BehaviourTree
             Sequance pursuitSequence = new Sequance(new List<Node> { new PreyInFOV(agent.transform, fovRange), _pursuit });
             Sequance searchSequance = new Sequance(new List<Node> { new CheckPreyInSmellRange(agent.transform, searchRadius), _search });
 
-            Sequance searchPursuitSequence = new Sequance(new List<Node> { searchSequance, pursuitSequence });
-
+      
             // Root
             Node root = new Selector(new List<Node>
             {
-               searchPursuitSequence,
-               _wander
-            }) ;
+                pursuitSequence,
+                searchSequance,
+                _wander
+            });
 
             return root;
         }
